@@ -5,7 +5,7 @@
 
 
 ## 🕹️ Live Demo
-**[PLAY THE GAME HERE](https://YOUR-USERNAME.github.io/gravity-dash/)** *(Replace with your actual link)*
+[PLAY THE GAME HERE](https://msavaliya1612.github.io/Gravity-Dash/)
 
 ## ✨ Key Features
 * **One-Touch Mechanics:** Tap to flip gravity and dodge spikes.
@@ -14,11 +14,6 @@
 * **Rewarded Ads:** Integrated "Revive" system to boost player retention.
 * **Global Leaderboard:** Track your high scores and compete for the top spot.
 
-## 💰 Monetization Strategy (2026 Ready)
-This project is designed to generate revenue through:
-1.  **Rewarded Videos:** Players watch an ad to get +50 coins or a life revive.
-2.  **Display Ads:** Optimized for Google AdSense or Monetag banners.
-3.  **Viral Loop:** Built-in "Share Score" mechanics to drive organic traffic from social media.
 
 ## 🛠️ Technical Stack
 * **Language:** JavaScript (ES6+)
@@ -26,7 +21,3 @@ This project is designed to generate revenue through:
 * **Styling:** CSS3 Neon Glow Effects
 * **Storage:** LocalStorage for coin and skin persistence
 
-## 🚀 How to Install
-1. Clone the repo: `git clone https://github.com/YOUR-USERNAME/gravity-dash.git`
-2. Open `index.html` in any browser.
-3. No dependencies or installations required!
