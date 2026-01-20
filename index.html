@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GRAVITY DASH | Music & Levels</title>
+    <title>GRAVITY DASH | Ultimate Music Edition</title>
     <style>
         :root { --blue: #00f2ff; --pink: #ff007f; --yellow: #fff200; --dark: #050505; }
         body { margin: 0; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
@@ -11,14 +11,16 @@
         canvas { width: 100%; height: 100%; display: block; }
         
         .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 10; }
-        .panel { background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 15px; text-align: center; pointer-events: auto; border: 2px solid var(--blue); min-width: 280px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
+        .panel { background: rgba(0, 0, 0, 0.95); padding: 30px; border-radius: 15px; text-align: center; pointer-events: auto; border: 2px solid var(--blue); min-width: 280px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
         .hidden { display: none !important; }
         
-        #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-weight: bold; pointer-events: none; z-index: 5; }
-        #lvl-msg { position: absolute; width: 100%; text-align: center; top: 40%; font-size: 3rem; color: var(--yellow); font-weight: 900; text-shadow: 0 0 20px var(--yellow); opacity: 0; transition: 0.3s; pointer-events: none; }
+        #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-weight: bold; pointer-events: none; z-index: 5; font-size: 1.1rem; }
+        #lvl-msg { position: absolute; width: 100%; text-align: center; top: 40%; font-size: 3.5rem; color: var(--yellow); font-weight: 900; text-shadow: 0 0 20px var(--yellow); opacity: 0; transition: 0.3s; pointer-events: none; z-index: 8; }
         
         button { background: var(--blue); border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin: 8px; border-radius: 8px; text-transform: uppercase; transition: 0.2s; color: black; }
         button:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .shop-grid { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .skin-btn { width: 40px; height: 40px; border: 2px solid #fff; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -26,6 +28,7 @@
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
     <div id="lvl-msg">LEVEL UP!</div>
+    
     <div id="hud">
         <div id="score-val">SCORE: 0</div>
         <div id="lvl-val" style="color: var(--pink);">LVL: 1</div>
@@ -34,19 +37,21 @@
 
     <div class="ui-layer" id="menu">
         <div class="panel">
-            <h1 style="color: var(--blue);">GRAVITY DASH</h1>
-            <button onclick="startGame()">Play Now</button><br>
+            <h1 style="color: var(--blue); margin-top:0;">GRAVITY DASH</h1>
+            <p>Tap to flip gravity. Listen for the beat!</p>
+            <button onclick="startGame()">Start Game</button><br>
             <button onclick="showLayer('shop')" style="background: var(--yellow);">Skins Shop</button>
         </div>
     </div>
 
     <div class="ui-layer hidden" id="shop">
         <div class="panel">
-            <h2 style="color: var(--yellow);">SHOP</h2>
-            <div style="display:flex; gap:10px; justify-content:center; margin:20px;">
-                <div onclick="setSkin('#00f2ff',0)" style="width:40px;height:40px;background:#00f2ff;cursor:pointer;"></div>
-                <div onclick="setSkin('#39ff14',50)" style="width:40px;height:40px;background:#39ff14;cursor:pointer;"></div>
-                <div onclick="setSkin('#ff00ff',100)" style="width:40px;height:40px;background:#ff00ff;cursor:pointer;"></div>
+            <h2 style="color: var(--yellow);">SKINS</h2>
+            <p>Your Coins: <span id="shop-coins">0</span></p>
+            <div class="shop-grid">
+                <div class="skin-btn" onclick="setSkin('#00f2ff', 0)" style="background:#00f2ff"></div>
+                <div class="skin-btn" onclick="setSkin('#39ff14', 50)" style="background:#39ff14"></div>
+                <div class="skin-btn" onclick="setSkin('#ff00ff', 100)" style="background:#ff00ff"></div>
             </div>
             <button onclick="showLayer('menu')">Back</button>
         </div>
@@ -54,9 +59,10 @@
 
     <div class="ui-layer hidden" id="game-over">
         <div class="panel" style="border-color: var(--pink);">
-            <h2 style="color: var(--pink);">CRASHED</h2>
-            <p id="final-stats"></p>
-            <button onclick="startGame()">Retry</button>
+            <h2 style="color: var(--pink);">WRECKED</h2>
+            <p id="final-stats" style="font-size: 1.2rem;"></p>
+            <button onclick="startGame()">Try Again</button><br>
+            <button onclick="showLayer('menu')" style="background: #555;">Menu</button>
         </div>
     </div>
 </div>
@@ -66,10 +72,10 @@
     const ctx = canvas.getContext('2d');
     canvas.width = 800; canvas.height = 450;
 
-    // --- PROCEDURAL MUSIC & SOUND ENGINE ---
+    // --- AUDIO SYSTEM (No Files Needed) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let musicInterval;
-    const scale = [261.63, 293.66, 329.63, 392.00, 440.00]; // Pentatonic C Major
+    let musicTimer;
+    const melodyScale = [261.63, 293.66, 329.63, 392.00, 440.00]; // C Major Pentatonic
 
     function playNote(freq, dur, vol, type='triangle') {
         const osc = audioCtx.createOscillator();
@@ -81,89 +87,99 @@
         osc.start(); osc.stop(audioCtx.currentTime + dur);
     }
 
-    function startMusic() {
-        if(musicInterval) clearInterval(musicInterval);
-        musicInterval = setInterval(() => {
+    function runMusic() {
+        if(musicTimer) clearInterval(musicTimer);
+        musicTimer = setInterval(() => {
             if(state !== 'PLAYING') return;
-            const note = scale[Math.floor(Math.random() * scale.length)];
-            playNote(note / 2, 0.5, 0.05, 'sine'); // Bass
-            if(Math.random() > 0.5) playNote(note * 2, 0.2, 0.03, 'triangle'); // Melody
-        }, 250);
+            const note = melodyScale[Math.floor(Math.random() * melodyScale.length)];
+            playNote(note / 2, 0.6, 0.04, 'sine'); // Bass
+            if(Math.random() > 0.6) playNote(note * 2, 0.2, 0.02, 'triangle'); // Lead
+        }, 200);
     }
 
-    // --- GAME LOGIC ---
+    // --- GAME ENGINE ---
     let coins = parseInt(localStorage.getItem('gd_coins')) || 0;
+    let high = parseInt(localStorage.getItem('gd_high')) || 0;
     let skin = localStorage.getItem('gd_skin') || '#00f2ff';
-    let state = 'MENU', score = 0, level = 1, speed = 5, player, objs, drops, frames;
+    let state = 'MENU', score = 0, level = 1, speed = 5, player, obstacles, rewards, frames;
 
     function startGame() {
         if(audioCtx.state === 'suspended') audioCtx.resume();
         player = { x: 100, y: 390, w: 30, h: 30, flipped: false, color: skin };
-        objs = []; drops = []; score = 0; level = 1; speed = 5; frames = 0;
+        obstacles = []; rewards = []; score = 0; level = 1; speed = 5; frames = 0;
         state = 'PLAYING';
         showLayer('none');
-        startMusic();
-        loop();
-    }
-
-    function setSkin(c, p) {
-        if(coins >= p) { skin = c; localStorage.setItem('gd_skin', c); alert("Equipped!"); }
-        else alert("Not enough coins!");
+        runMusic();
+        animate();
     }
 
     function showLayer(id) {
         document.querySelectorAll('.ui-layer').forEach(l => l.classList.add('hidden'));
         if(id !== 'none') document.getElementById(id).classList.remove('hidden');
+        if(id === 'shop') document.getElementById('shop-coins').innerText = coins;
+    }
+
+    function setSkin(c, p) {
+        if(coins >= p) { 
+            if(p > 0 && skin !== c) coins -= p;
+            skin = c; 
+            localStorage.setItem('gd_skin', c); 
+            localStorage.setItem('gd_coins', coins);
+            player.color = c;
+            alert("Skin Applied!");
+            showLayer('shop');
+        } else alert("Not enough coins!");
     }
 
     window.addEventListener('mousedown', () => {
         if(state === 'PLAYING') {
             player.flipped = !player.flipped;
-            playNote(150, 0.1, 0.1, 'square'); // Jump sound
+            playNote(200, 0.1, 0.1, 'square'); // Jump Sound
         }
     });
 
-    function loop() {
+    function animate() {
         if(state !== 'PLAYING') return;
         ctx.fillStyle = '#050505'; ctx.fillRect(0,0,800,450);
 
-        // Level Up
-        let newLvl = Math.floor(score/50) + 1;
-        if(newLvl > level) {
-            level = newLvl; speed += 0.8;
-            document.getElementById('lvl-msg').style.opacity = 1;
-            setTimeout(() => document.getElementById('lvl-msg').style.opacity = 0, 1000);
-            playNote(500, 0.5, 0.1, 'sine');
+        // Level Progression
+        let nextLvl = Math.floor(score/50) + 1;
+        if(nextLvl > level) {
+            level = nextLvl; speed += 0.7;
+            const msg = document.getElementById('lvl-msg');
+            msg.style.opacity = 1;
+            setTimeout(() => msg.style.opacity = 0, 1000);
+            playNote(600, 0.4, 0.1, 'sine'); // Level Up Sound
         }
 
-        // Player physics
+        // Draw Player
         player.y += player.flipped ? -speed*1.8 : speed*1.8;
         player.y = Math.max(30, Math.min(390, player.y));
-        
         ctx.shadowBlur = 15; ctx.shadowColor = player.color;
         ctx.fillStyle = player.color;
         ctx.fillRect(player.x, player.y, player.w, player.h);
         ctx.shadowBlur = 0;
 
-        // Obstacles & Coins
-        if(frames % 70 === 0) objs.push({x: 800, y: Math.random()>0.5?0:380, w: 30, h: 70});
-        if(frames % 100 === 0) drops.push({x: 800, y: Math.random()>0.5?80:320, w: 15, h: 15});
+        // Obstacles
+        if(frames % 70 === 0) obstacles.push({x: 800, y: Math.random()>0.5?0:380, w: 30, h: 70});
+        if(frames % 120 === 0) rewards.push({x: 800, y: Math.random()>0.5?80:320, w: 15, h: 15});
 
-        drops.forEach((d, i) => {
-            d.x -= speed;
-            ctx.fillStyle = var(--yellow); ctx.beginPath(); ctx.arc(d.x, d.y, 8, 0, Math.PI*2); ctx.fill();
-            if(player.x < d.x+15 && player.x+30 > d.x && player.y < d.y+15 && player.y+30 > d.y) {
-                drops.splice(i,1); coins++; playNote(800, 0.1, 0.1, 'sine');
+        rewards.forEach((r, i) => {
+            r.x -= speed;
+            ctx.fillStyle = '#fff200'; ctx.beginPath(); ctx.arc(r.x, r.y, 8, 0, Math.PI*2); ctx.fill();
+            if(player.x < r.x+15 && player.x+30 > r.x && player.y < r.y+15 && player.y+30 > r.y) {
+                rewards.splice(i, 1); coins++; playNote(900, 0.1, 0.1, 'sine');
                 localStorage.setItem('gd_coins', coins);
             }
         });
 
-        objs.forEach(o => {
+        obstacles.forEach(o => {
             o.x -= speed;
             ctx.fillStyle = '#ff007f'; ctx.fillRect(o.x, o.y, o.w, o.h);
-            if(player.x < o.x+o.w && player.x+player.w > o.x && player.y < o.y+o.h && player.y+player.h > o.y) {
+            if(player.x < o.x+o.w && player.x+30 > o.x && player.y < o.y+o.h && player.y+30 > o.y) {
                 state = 'GAMEOVER'; playNote(100, 0.5, 0.2, 'sawtooth');
-                document.getElementById('final-stats').innerText = `SCORE: ${Math.floor(score)}`;
+                if(score > high) { high = Math.floor(score); localStorage.setItem('gd_high', high); }
+                document.getElementById('final-stats').innerText = `Score: ${Math.floor(score)} | Best: ${high}`;
                 showLayer('game-over');
             }
         });
@@ -172,7 +188,7 @@
         document.getElementById('score-val').innerText = `SCORE: ${Math.floor(score)}`;
         document.getElementById('lvl-val').innerText = `LVL: ${level}`;
         document.getElementById('coin-val').innerText = `COINS: ${coins}`;
-        requestAnimationFrame(loop);
+        requestAnimationFrame(animate);
     }
 </script>
 </body>
