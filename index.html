@@ -3,82 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GRAVITY DASH | Pro Viral Edition</title>
+    <title>GRAVITY DASH | Music & Levels</title>
     <style>
-        :root {
-            --neon-blue: #00f2ff;
-            --neon-pink: #ff007f;
-            --neon-yellow: #fff200;
-            --bg-dark: #0a0a0a;
-        }
-        body { margin: 0; background: var(--bg-dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        
-        #game-container { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16/9; border: 2px solid #333; background: #000; overflow: hidden;}
+        :root { --blue: #00f2ff; --pink: #ff007f; --yellow: #fff200; --dark: #050505; }
+        body { margin: 0; background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #game-container { position: relative; width: 100%; max-width: 800px; aspect-ratio: 16/9; border: 2px solid #333; background: #000; overflow: hidden; }
         canvas { width: 100%; height: 100%; display: block; }
-
-        /* UI Layers */
+        
         .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 10; }
-        .panel { background: rgba(0, 0, 0, 0.9); padding: 25px; border-radius: 15px; text-align: center; pointer-events: auto; border: 2px solid var(--neon-blue); min-width: 280px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        .panel { background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 15px; text-align: center; pointer-events: auto; border: 2px solid var(--blue); min-width: 280px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
         .hidden { display: none !important; }
-
-        /* HUD */
-        #stats-bar { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; pointer-events: none; z-index: 5; }
         
-        button { background: var(--neon-blue); border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; margin: 8px; border-radius: 8px; text-transform: uppercase; transition: 0.2s; }
+        #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; font-weight: bold; pointer-events: none; z-index: 5; }
+        #lvl-msg { position: absolute; width: 100%; text-align: center; top: 40%; font-size: 3rem; color: var(--yellow); font-weight: 900; text-shadow: 0 0 20px var(--yellow); opacity: 0; transition: 0.3s; pointer-events: none; }
+        
+        button { background: var(--blue); border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin: 8px; border-radius: 8px; text-transform: uppercase; transition: 0.2s; color: black; }
         button:hover { transform: scale(1.05); filter: brightness(1.2); }
-        
-        .skin-grid { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-        .skin-btn { width: 40px; height: 40px; border: 2px solid #fff; cursor: pointer; border-radius: 5px; }
-        
-        #leaderboard-list { text-align: left; margin: 15px 0; font-family: monospace; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
-    
-    <div id="stats-bar">
-        <div id="score-display">SCORE: 0</div>
-        <div id="coin-display" style="color: var(--neon-yellow);">COINS: 0</div>
+    <div id="lvl-msg">LEVEL UP!</div>
+    <div id="hud">
+        <div id="score-val">SCORE: 0</div>
+        <div id="lvl-val" style="color: var(--pink);">LVL: 1</div>
+        <div id="coin-val" style="color: var(--yellow);">COINS: 0</div>
     </div>
 
     <div class="ui-layer" id="menu">
         <div class="panel">
-            <h1 style="color: var(--neon-blue); margin-top:0;">GRAVITY DASH</h1>
+            <h1 style="color: var(--blue);">GRAVITY DASH</h1>
             <button onclick="startGame()">Play Now</button><br>
-            <button onclick="toggleLayer('shop')" style="background: var(--neon-yellow); color: black;">Skins Shop</button><br>
-            <button onclick="toggleLayer('leaderboard')" style="background: #555;">Leaderboard</button>
+            <button onclick="showLayer('shop')" style="background: var(--yellow);">Skins Shop</button>
         </div>
     </div>
 
     <div class="ui-layer hidden" id="shop">
-        <div class="panel" style="border-color: var(--neon-yellow);">
-            <h2 style="color: var(--neon-yellow);">SKINS SHOP</h2>
-            <p>Your Coins: <span id="shop-coins">0</span></p>
-            <div class="skin-grid">
-                <div class="skin-btn" onclick="setSkin('#00f2ff', 0)" style="background:#00f2ff"></div>
-                <div class="skin-btn" onclick="setSkin('#00ff00', 50)" style="background:#00ff00"></div>
-                <div class="skin-btn" onclick="setSkin('#ff00ff', 100)" style="background:#ff00ff"></div>
-            </div>
-            <button onclick="toggleLayer('menu')">Back</button>
-        </div>
-    </div>
-
-    <div class="ui-layer hidden" id="leaderboard">
         <div class="panel">
-            <h2 style="color: var(--neon-blue);">GLOBAL TOP 5</h2>
-            <div id="leaderboard-list"></div>
-            <button onclick="toggleLayer('menu')">Back</button>
+            <h2 style="color: var(--yellow);">SHOP</h2>
+            <div style="display:flex; gap:10px; justify-content:center; margin:20px;">
+                <div onclick="setSkin('#00f2ff',0)" style="width:40px;height:40px;background:#00f2ff;cursor:pointer;"></div>
+                <div onclick="setSkin('#39ff14',50)" style="width:40px;height:40px;background:#39ff14;cursor:pointer;"></div>
+                <div onclick="setSkin('#ff00ff',100)" style="width:40px;height:40px;background:#ff00ff;cursor:pointer;"></div>
+            </div>
+            <button onclick="showLayer('menu')">Back</button>
         </div>
     </div>
 
     <div class="ui-layer hidden" id="game-over">
-        <div class="panel" style="border-color: var(--neon-pink);">
-            <h2 style="color: var(--neon-pink);">CRASHED!</h2>
-            <p id="final-score" style="font-size: 1.5rem;">Score: 0</p>
-            <button onclick="startGame()">Try Again</button><br>
-            <button id="revive-btn" style="background: var(--neon-pink);" onclick="watchAd()">Watch Ad (+50 Coins)</button>
+        <div class="panel" style="border-color: var(--pink);">
+            <h2 style="color: var(--pink);">CRASHED</h2>
+            <p id="final-stats"></p>
+            <button onclick="startGame()">Retry</button>
         </div>
     </div>
 </div>
@@ -88,137 +66,114 @@
     const ctx = canvas.getContext('2d');
     canvas.width = 800; canvas.height = 450;
 
-    // Persistant Data
-    let coins = parseInt(localStorage.getItem('dashCoins')) || 0;
-    let highScore = localStorage.getItem('dashHigh') || 0;
-    let playerColor = localStorage.getItem('dashSkin') || '#00f2ff';
+    // --- PROCEDURAL MUSIC & SOUND ENGINE ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicInterval;
+    const scale = [261.63, 293.66, 329.63, 392.00, 440.00]; // Pentatonic C Major
 
-    // Game State
-    let gameState = 'MENU', score = 0, gameSpeed = 5, player, obstacles, rewards, frames, animationId;
-
-    class Player {
-        constructor() { this.width = 30; this.height = 30; this.x = 100; this.y = canvas.height - 60; this.isUpsideDown = false; }
-        draw() {
-            ctx.shadowBlur = 15; ctx.shadowColor = playerColor;
-            ctx.fillStyle = playerColor;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-            ctx.shadowBlur = 0;
-        }
-        update() {
-            this.y += (this.isUpsideDown ? -10 : 10);
-            if (this.y < 30) this.y = 30;
-            if (this.y > canvas.height - 60) this.y = canvas.height - 60;
-        }
+    function playNote(freq, dur, vol, type='triangle') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
     }
 
-    class Obstacle {
-        constructor() {
-            this.width = 30; this.height = 40 + Math.random() * 70;
-            this.x = canvas.width;
-            this.onCeiling = Math.random() > 0.5;
-            this.y = this.onCeiling ? 0 : canvas.height - this.height;
-        }
-        draw() { ctx.fillStyle = '#ff007f'; ctx.fillRect(this.x, this.y, this.width, this.height); }
-        update() { this.x -= gameSpeed; }
+    function startMusic() {
+        if(musicInterval) clearInterval(musicInterval);
+        musicInterval = setInterval(() => {
+            if(state !== 'PLAYING') return;
+            const note = scale[Math.floor(Math.random() * scale.length)];
+            playNote(note / 2, 0.5, 0.05, 'sine'); // Bass
+            if(Math.random() > 0.5) playNote(note * 2, 0.2, 0.03, 'triangle'); // Melody
+        }, 250);
     }
 
-    class Coin {
-        constructor() {
-            this.x = canvas.width;
-            this.y = Math.random() > 0.5 ? 60 : canvas.height - 90;
-            this.size = 15;
-        }
-        draw() {
-            ctx.fillStyle = '#fff200';
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.size/2, 0, Math.PI*2); ctx.fill();
-        }
-        update() { this.x -= gameSpeed; }
-    }
-
-    function toggleLayer(id) {
-        document.querySelectorAll('.ui-layer').forEach(l => l.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(id === 'leaderboard') updateLeaderboard();
-        if(id === 'shop') document.getElementById('shop-coins').innerText = coins;
-    }
+    // --- GAME LOGIC ---
+    let coins = parseInt(localStorage.getItem('gd_coins')) || 0;
+    let skin = localStorage.getItem('gd_skin') || '#00f2ff';
+    let state = 'MENU', score = 0, level = 1, speed = 5, player, objs, drops, frames;
 
     function startGame() {
-        player = new Player(); obstacles = []; rewards = []; score = 0; frames = 0; gameSpeed = 5;
-        gameState = 'PLAYING';
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        player = { x: 100, y: 390, w: 30, h: 30, flipped: false, color: skin };
+        objs = []; drops = []; score = 0; level = 1; speed = 5; frames = 0;
+        state = 'PLAYING';
+        showLayer('none');
+        startMusic();
+        loop();
+    }
+
+    function setSkin(c, p) {
+        if(coins >= p) { skin = c; localStorage.setItem('gd_skin', c); alert("Equipped!"); }
+        else alert("Not enough coins!");
+    }
+
+    function showLayer(id) {
         document.querySelectorAll('.ui-layer').forEach(l => l.classList.add('hidden'));
-        animate();
+        if(id !== 'none') document.getElementById(id).classList.remove('hidden');
     }
 
-    function setSkin(color, cost) {
-        if (coins >= cost) {
-            if (cost > 0) coins -= cost;
-            playerColor = color;
-            localStorage.setItem('dashSkin', color);
-            saveData();
-            alert("Skin Equipped!");
-            toggleLayer('shop');
-        } else { alert("Need more coins!"); }
-    }
+    window.addEventListener('mousedown', () => {
+        if(state === 'PLAYING') {
+            player.flipped = !player.flipped;
+            playNote(150, 0.1, 0.1, 'square'); // Jump sound
+        }
+    });
 
-    function watchAd() {
-        alert("Ad finished! You earned 50 coins.");
-        coins += 50;
-        saveData();
-        toggleLayer('menu');
-    }
+    function loop() {
+        if(state !== 'PLAYING') return;
+        ctx.fillStyle = '#050505'; ctx.fillRect(0,0,800,450);
 
-    function updateLeaderboard() {
-        const list = document.getElementById('leaderboard-list');
-        const scores = [{n: "Champion", s: 5000}, {n: "Player1", s: 2500}, {n: "You", s: Math.floor(highScore)}];
-        scores.sort((a,b) => b.s - a.s);
-        list.innerHTML = scores.map((s, i) => `<div>${i+1}. ${s.n} : ${s.s}</div>`).join('');
-    }
+        // Level Up
+        let newLvl = Math.floor(score/50) + 1;
+        if(newLvl > level) {
+            level = newLvl; speed += 0.8;
+            document.getElementById('lvl-msg').style.opacity = 1;
+            setTimeout(() => document.getElementById('lvl-msg').style.opacity = 0, 1000);
+            playNote(500, 0.5, 0.1, 'sine');
+        }
 
-    function saveData() {
-        localStorage.setItem('dashCoins', coins);
-        document.getElementById('coin-display').innerText = `COINS: ${coins}`;
-    }
+        // Player physics
+        player.y += player.flipped ? -speed*1.8 : speed*1.8;
+        player.y = Math.max(30, Math.min(390, player.y));
+        
+        ctx.shadowBlur = 15; ctx.shadowColor = player.color;
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+        ctx.shadowBlur = 0;
 
-    window.addEventListener('mousedown', () => { if(gameState === 'PLAYING') player.isUpsideDown = !player.isUpsideDown; });
+        // Obstacles & Coins
+        if(frames % 70 === 0) objs.push({x: 800, y: Math.random()>0.5?0:380, w: 30, h: 70});
+        if(frames % 100 === 0) drops.push({x: 800, y: Math.random()>0.5?80:320, w: 15, h: 15});
 
-    function animate() {
-        if (gameState !== 'PLAYING') return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Grid lines for style
-        ctx.strokeStyle = '#222';
-        for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
-
-        player.update(); player.draw();
-
-        if (frames % 100 === 0) obstacles.push(new Obstacle());
-        if (frames % 150 === 0) rewards.push(new Coin());
-
-        rewards.forEach((c, i) => {
-            c.update(); c.draw();
-            if (player.x < c.x + c.size && player.x + player.width > c.x && player.y < c.y + c.size && player.y + player.height > c.y) {
-                rewards.splice(i, 1); coins++; saveData();
+        drops.forEach((d, i) => {
+            d.x -= speed;
+            ctx.fillStyle = var(--yellow); ctx.beginPath(); ctx.arc(d.x, d.y, 8, 0, Math.PI*2); ctx.fill();
+            if(player.x < d.x+15 && player.x+30 > d.x && player.y < d.y+15 && player.y+30 > d.y) {
+                drops.splice(i,1); coins++; playNote(800, 0.1, 0.1, 'sine');
+                localStorage.setItem('gd_coins', coins);
             }
         });
 
-        obstacles.forEach((obs) => {
-            obs.update(); obs.draw();
-            if (player.x < obs.x + obs.width && player.x + player.width > obs.x && player.y < obs.y + obs.height && player.y + player.height > obs.y) {
-                gameState = 'GAMEOVER';
-                if(score > highScore) { highScore = score; localStorage.setItem('dashHigh', highScore); }
-                document.getElementById('final-score').innerText = `SCORE: ${Math.floor(score)}`;
-                toggleLayer('game-over');
+        objs.forEach(o => {
+            o.x -= speed;
+            ctx.fillStyle = '#ff007f'; ctx.fillRect(o.x, o.y, o.w, o.h);
+            if(player.x < o.x+o.w && player.x+player.w > o.x && player.y < o.y+o.h && player.y+player.h > o.y) {
+                state = 'GAMEOVER'; playNote(100, 0.5, 0.2, 'sawtooth');
+                document.getElementById('final-stats').innerText = `SCORE: ${Math.floor(score)}`;
+                showLayer('game-over');
             }
         });
 
-        score += 0.1; gameSpeed += 0.0005;
-        document.getElementById('score-display').innerText = `SCORE: ${Math.floor(score)}`;
-        frames++;
-        animationId = requestAnimationFrame(animate);
+        score += 0.1; frames++;
+        document.getElementById('score-val').innerText = `SCORE: ${Math.floor(score)}`;
+        document.getElementById('lvl-val').innerText = `LVL: ${level}`;
+        document.getElementById('coin-val').innerText = `COINS: ${coins}`;
+        requestAnimationFrame(loop);
     }
-
-    // Initialize HUD
-    document.getElementById('coin-display').innerText = `COINS: ${coins}`;
 </script>
 </body>
 </html>
